@@ -32,7 +32,9 @@ function formatMenuTemplateForStack(clipboard, stack){
     return stack.map((item, i) => {
         return {
             label: `Copy: ${formatItem(item)}`,
-            click: _ => clipboard.writeText(item)
+            click: _ => clipboard.writeText(item),
+            //looks like this only works in MacOS
+            accelerator: `CommandOrControl+Alt+${i + 1}`
         };
     });
 }
@@ -40,7 +42,7 @@ function formatMenuTemplateForStack(clipboard, stack){
 function registerShortcuts(globalShortcut, clipboard, stack){
     globalShortcut.unregisterAll();
     for(let i = 0; i < STACK_SIZE; i++){
-        globalShortcut.register(`CommandOrControl+${i + 1}`, _ => {
+        globalShortcut.register(`CommandOrControl+Alt+${i + 1}`, _ => {
             clipboard.writeText(stack[i]);
         });
     }
@@ -59,4 +61,8 @@ app.on('ready', _ => {
         tray.setContextMenu(Menu.buildFromTemplate(formatMenuTemplateForStack(clipboard, stack)));
         registerShortcuts(globalShortcut, clipboard, stack);
     });
+});
+
+app.on('will-quit', _ => {
+    globalShortcut.unregisterAll();
 });
